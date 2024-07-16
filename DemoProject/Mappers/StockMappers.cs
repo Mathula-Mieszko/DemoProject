@@ -13,6 +13,7 @@ namespace DemoProject.Mappers
                 Symbol = stockModel.Symbol,
                 CompanyName = stockModel.CompanyName,
                 Price = stockModel.Price,
+                Comments = stockModel.Comment.Select(c=>c.ToCommentDto()).ToList(),
             };
         }
 

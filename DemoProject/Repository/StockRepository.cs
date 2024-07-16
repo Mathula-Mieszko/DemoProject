@@ -38,12 +38,17 @@ namespace DemoProject.Repository
         public async Task<List<Stock>> GetAllAsync()
         {
             //return _dbContext.Stocks.FromSqlRaw("SELECT * FROM getStocks()").ToListAsync();
-           return await _dbContext.Stocks.ToListAsync();
+           return await _dbContext.Stocks.Include(c=>c.Comment).ToListAsync();
         }
 
         public async Task<Stock?> GetByIdAsync(int id)
         {
-            return await _dbContext.Stocks.FindAsync(id);
+            return await _dbContext.Stocks.Include(c => c.Comment).FirstOrDefaultAsync(s=>s.Id== id);
+        }
+
+        public async Task<bool> StockExist(int id)
+        {
+            return await _dbContext.Stocks.AnyAsync(s => s.Id == id);
         }
 
         public async Task<Stock?> UpdateAsync(int id, UpdateStockRequestDto stockDto)
