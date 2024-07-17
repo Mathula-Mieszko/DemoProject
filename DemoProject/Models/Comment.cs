@@ -1,5 +1,9 @@
-﻿namespace DemoProject.Models
+﻿using System.ComponentModel.DataAnnotations.Schema;
+
+namespace DemoProject.Models
 {
+    [Table("Comments")]
+
     public class Comment
     {
         public int Id { get; set; }
@@ -9,5 +13,8 @@
         public int? StockId { get; set; }
 
         public Stock? Stock { get; set; }
+
+        public string AppUserId {  get; set; }
+        public AppUser AppUser { get; set; }
     }
 }

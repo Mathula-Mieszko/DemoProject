@@ -3,6 +3,7 @@ using System;
 using DemoProject.data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace DemoProject.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240717124817_Portfolios")]
+    partial class Portfolios
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -94,10 +97,6 @@ namespace DemoProject.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("AppUserId")
-                        .IsRequired()
-                        .HasColumnType("text");
-
                     b.Property<string>("Content")
                         .IsRequired()
                         .HasColumnType("text");
@@ -110,8 +109,6 @@ namespace DemoProject.Migrations
                         .HasColumnType("text");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("AppUserId");
 
                     b.HasIndex("StockId");
 
@@ -185,13 +182,13 @@ namespace DemoProject.Migrations
                     b.HasData(
                         new
                         {
-                            Id = "97a954b7-bfd2-4579-88b0-c563ddb35d61",
+                            Id = "0656e3ec-2b4d-48f1-953e-849c5d3e4a77",
                             Name = "Admin",
                             NormalizedName = "ADMIN"
                         },
                         new
                         {
-                            Id = "94579032-54a1-4ad6-8f92-3c87add48fb7",
+                            Id = "28424a04-d019-4ddd-a6af-f0d9be721113",
                             Name = "User",
                             NormalizedName = "USER"
                         });
@@ -305,17 +302,9 @@ namespace DemoProject.Migrations
 
             modelBuilder.Entity("DemoProject.Models.Comment", b =>
                 {
-                    b.HasOne("DemoProject.Models.AppUser", "AppUser")
-                        .WithMany()
-                        .HasForeignKey("AppUserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.HasOne("DemoProject.Models.Stock", "Stock")
                         .WithMany("Comment")
                         .HasForeignKey("StockId");
-
-                    b.Navigation("AppUser");
 
                     b.Navigation("Stock");
                 });

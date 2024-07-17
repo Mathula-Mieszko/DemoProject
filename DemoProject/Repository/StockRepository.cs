@@ -1,5 +1,6 @@
 ﻿using DemoProject.data;
 using DemoProject.Dtos.Stock;
+using DemoProject.Helpers;
 using DemoProject.Interfaces;
 using DemoProject.Mappers;
 using DemoProject.Models;
@@ -35,15 +36,37 @@ namespace DemoProject.Repository
             return stock;
         }
 
-        public async Task<List<Stock>> GetAllAsync()
+        public async Task<List<Stock>> GetAllAsync(QueryObject query)
         {
             //return _dbContext.Stocks.FromSqlRaw("SELECT * FROM getStocks()").ToListAsync();
-           return await _dbContext.Stocks.Include(c=>c.Comment).ToListAsync();
+            var stocks =  _dbContext.Stocks.Include(c=>c.Comment).ThenInclude(u => u.AppUser).AsQueryable();
+            if (!string.IsNullOrWhiteSpace(query.CompanyName))
+            {
+                stocks = stocks.Where(s=>s.CompanyName.Contains(query.CompanyName));
+            }
+            if (!string.IsNullOrWhiteSpace(query.Symbol))
+            {
+                stocks = stocks.Where(s=>s.Symbol.Contains(query.Symbol));
+            }
+            if (!string.IsNullOrWhiteSpace(query.SortBy))
+            {
+                if (query.SortBy.Equals("Symbol",StringComparison.OrdinalIgnoreCase))
+                {
+                    stocks = query.IsDescending? stocks.OrderByDescending(s=>s.Symbol):stocks.OrderBy(s=>s.Symbol);
+                }
+            }
+            var skipNumber = (query.PageNumber - 1) * query.PageSize;
+            return await stocks.Skip(skipNumber).Take(query.PageSize).ToListAsync();
         }
 
         public async Task<Stock?> GetByIdAsync(int id)
         {
-            return await _dbContext.Stocks.Include(c => c.Comment).FirstOrDefaultAsync(s=>s.Id== id);
+            return await _dbContext.Stocks.Include(c => c.Comment).ThenInclude(u=>u.AppUser).FirstOrDefaultAsync(s=>s.Id== id);
+        }
+
+        public async Task<Stock?> GetBySymbolAsync(string symbol)
+        {
+            return await _dbContext.Stocks.FirstOrDefaultAsync(s => s.Symbol == symbol);
         }
 
         public async Task<bool> StockExist(int id)

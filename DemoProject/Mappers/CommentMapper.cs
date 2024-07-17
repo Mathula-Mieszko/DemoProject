@@ -11,6 +11,7 @@ namespace DemoProject.Mappers
                 Id = commentModel.Id,
                 Title = commentModel.Title,
                 Content = commentModel.Content,
+                CreatedBy = commentModel.AppUser.UserName,
                 StockId = commentModel.StockId,
             };
         }

@@ -1,7 +1,9 @@
 ﻿using DemoProject.data;
 using DemoProject.Dtos.Stock;
+using DemoProject.Helpers;
 using DemoProject.Interfaces;
 using DemoProject.Mappers;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -20,15 +22,22 @@ namespace DemoProject.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult>Get() {
-            var stocks = await _stockRepository.GetAllAsync();
+        [Authorize]
+        public async Task<IActionResult>Get([FromQuery]QueryObject query) {
 
-            var stockDtos = stocks.Select(s=>s.ToStockDto());
+
+
+            if(!ModelState.IsValid) 
+                return BadRequest(ModelState);
+
+            var stocks = await _stockRepository.GetAllAsync(query);
+
+            var stockDtos = stocks.Select(s=>s.ToStockDto()).ToList();
 
             return Ok(stockDtos);
         }
 
-        [HttpGet("{id}")]
+        [HttpGet("{id:int}")]
         public async Task<IActionResult> Get([FromRoute]int id) {
             var stock = await _stockRepository.GetByIdAsync(id);
             if (stock == null) {
@@ -47,7 +56,7 @@ namespace DemoProject.Controllers
         }
 
         [HttpPut]
-        [Route("{id}")]
+        [Route("{id:int}")]
         public async Task<IActionResult> Update([FromRoute] int id, [FromBody] UpdateStockRequestDto stockRequestDto)
         {
             var stockModel = await _stockRepository.UpdateAsync(id, stockRequestDto);
@@ -61,7 +70,7 @@ namespace DemoProject.Controllers
         }
 
         [HttpDelete]
-        [Route("{id}")]
+        [Route("{id:int}")]
         public async Task<IActionResult> Delete([FromRoute] int id)
         {
             var stockModel = await _stockRepository.DeleteAsync(id);
